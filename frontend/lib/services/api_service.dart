@@ -12,7 +12,7 @@ import '../models/product_instance.dart';
 class ApiService {
   final String baseUrl;
 
-  ApiService({this.baseUrl = 'http://10.0.2.2:8000/api'});
+  ApiService({this.baseUrl = 'https://9038-194-69-103-34.ngrok-free.app/api'});
 
   // Products
   Future<List<Product>> getProducts() async {
@@ -185,7 +185,9 @@ class ApiService {
   }
 
   Future<Warehouse> getWarehouse(String id) async {
+    Map<String, String> headers = {'ngrok-skip-browser-warning': 'flutter_app'};
     final response = await http.get(Uri.parse('$baseUrl/warehouses/$id/'));
+    print(response.body);
     if (response.statusCode == 200) {
       return Warehouse.fromJson(jsonDecode(response.body));
     } else {
