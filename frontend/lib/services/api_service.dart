@@ -185,7 +185,9 @@ class ApiService {
   }
 
   Future<Warehouse> getWarehouse(String id) async {
+    Map<String, String> headers = {'ngrok-skip-browser-warning': 'flutter_app'};
     final response = await http.get(Uri.parse('$baseUrl/warehouses/$id/'));
+    print(response.body);
     if (response.statusCode == 200) {
       return Warehouse.fromJson(jsonDecode(response.body));
     } else {
