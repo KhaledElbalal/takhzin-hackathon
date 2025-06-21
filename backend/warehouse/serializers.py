@@ -58,7 +58,7 @@ class WarehouseObjectSerializer(serializers.ModelSerializer):
 
 
 class WarehouseSerializer(serializers.ModelSerializer):
-    objects = WarehouseObjectSerializer(many=True, read_only=True)
+    warehouse_objects = WarehouseObjectSerializer(many=True, read_only=True)
 
     class Meta:
         model = Warehouse

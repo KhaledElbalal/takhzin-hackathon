@@ -57,7 +57,7 @@ class WarehouseObject(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     warehouse = models.ForeignKey(
-        Warehouse, related_name='objects', on_delete=models.CASCADE
+        Warehouse, related_name='warehouse_objects', on_delete=models.CASCADE
     )
     object_type = models.CharField(max_length=8, choices=OBJECT_TYPE_CHOICES)
     width = models.IntegerField()
