@@ -40,3 +40,4 @@ class WarehouseObject {
       'y': y,
     };
   }
+}
