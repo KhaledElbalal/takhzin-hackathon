@@ -15,7 +15,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Warehouses',
-      theme: ThemeData(primarySwatch: Colors.blue),
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
       home: const WarehouseListScreen(),
     );
   }
@@ -57,36 +60,39 @@ class _WarehouseListScreenState extends State<WarehouseListScreen> {
               itemCount: warehouses.length,
               itemBuilder: (context, index) {
                 final warehouse = warehouses[index];
-                return ListTile(
-                  title: Text(warehouse.name),
-                  subtitle: Text('Size: ${warehouse.width} x ${warehouse.length}'),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => WarehouseViewPage(warehouseId: warehouse.id),
-                            ),
-                          );
-                        },
-                        child: const Text('View'),
-                      ),
-                      const SizedBox(width: 8),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => WarehouseEditPage(warehouseId: warehouse.id),
-                            ),
-                          );
-                        },
-                        child: const Text('Edit'),
-                      ),
-                    ],
+                return Card(
+                  margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  child: ListTile(
+                    title: Text(warehouse.name, style: const TextStyle(fontWeight: FontWeight.w600)),
+                    subtitle: Text('Size: ${warehouse.width} x ${warehouse.length}'),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => WarehouseViewPage(warehouseId: warehouse.id),
+                              ),
+                            );
+                          },
+                          child: const Text('View'),
+                        ),
+                        const SizedBox(width: 8),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => WarehouseEditPage(warehouseId: warehouse.id),
+                              ),
+                            );
+                          },
+                          child: const Text('Edit'),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },

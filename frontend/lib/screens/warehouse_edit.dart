@@ -32,7 +32,7 @@ class _WarehouseEditPageState extends State<WarehouseEditPage> {
     final newObj = WarehouseObject(
       id: '',
       warehouse: warehouse.id,
-      objectType: type,
+      objectType: type.toLowerCase(),
       width: width,
       length: length,
       x: x,
@@ -72,6 +72,7 @@ class _WarehouseEditPageState extends State<WarehouseEditPage> {
                   child: Center(
                     child: WarehouseView(
                       warehouse: warehouse,
+                      allowEdit: true,
                     ),
                   ),
                 ),

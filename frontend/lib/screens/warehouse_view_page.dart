@@ -48,7 +48,10 @@ class _WarehouseViewPageState extends State<WarehouseViewPage> {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (snapshot.hasData) {
             return Center(
-              child: WarehouseView(warehouse: snapshot.data!),
+              child: WarehouseView(
+                warehouse: snapshot.data!,
+                allowEdit: false,
+              ),
             );
           } else {
             return const Center(child: Text('No data available'));
