@@ -30,7 +30,7 @@ class _WarehouseEditPageState extends State<WarehouseEditPage> {
   }
   void _addObject(int x, int y, int width, int length, String type) {
     final newObj = WarehouseObject(
-      id: 0,
+      id: '',
       warehouse: warehouse.id,
       objectType: type,
       width: width,

@@ -1,6 +1,6 @@
 // Model class for WarehouseObject
 class WarehouseObject {
-  final int id;
+  final String id;
   final String warehouse;
   final String objectType;
   final int width;
@@ -20,7 +20,7 @@ class WarehouseObject {
 
   factory WarehouseObject.fromJson(Map<String, dynamic> json) =>
       WarehouseObject(
-        id: json['id'] as int,
+        id: json['id'] as String,
         warehouse: json['warehouse'] as String,
         objectType: json['object_type'] as String,
         width: json['width'] as int,
