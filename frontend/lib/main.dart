@@ -1,128 +1,155 @@
+// main.dart
 import 'package:flutter/material.dart';
-import 'screens/warehouse_statistics_page.dart'; // Import your page
+import 'package:hackathon/services/api_service.dart';
+import 'package:hackathon/ui/warehouse_view.dart';
+import 'models/warehouse.dart';
+import 'models/warehouse_object.dart';
+
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
-  //   @override
-  //   Widget build(BuildContext context) {
-  //     return MaterialApp(
-  //       title: 'Flutter Demo',
-  //       theme: ThemeData(
-  //         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-  //       ),
-  //       home: const MyHomePage(title: 'Flutter Demo Home Page'),
-  //     );
-  //   }
-  // }
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Warehouse App',
+      title: 'Warehouse Viewer',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: WarehouseStatisticsPage(), // Show this page by default
+      home: WarehouseScreen(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
+class WarehouseScreen extends StatefulWidget {
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  _WarehouseScreenState createState() => _WarehouseScreenState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _WarehouseScreenState extends State<WarehouseScreen> {
+  final ApiService apiService = ApiService();
+  late Future<Warehouse> warehouseFuture;
+  late Warehouse warehouse;
 
-  static const Color takhzinPrimary = Color(0xFFCF1D51);
+  @override
+  void initState() {
+    super.initState();
+    warehouseFuture = apiService.getWarehouse("32ef7f79-f154-43ba-8be1-7a1db92da430");
+    warehouseFuture.then((value) {
+      setState(() {
+        warehouse = value;
+      });
+    });
+  }
+  void _addObject(int x, int y, int width, int length, String type) {
+    final newObj = WarehouseObject(
+      id: DateTime.now().toIso8601String(),
+      warehouse: warehouse.id,
+      objectType: type,
+      width: width,
+      length: length,
+      x: x,
+      y: y,
+    );
+
+    setState(() {
+      warehouse.warehouseObjects.add(newObj);
+    });
+  }
+
+  final _xController = TextEditingController();
+  final _yController = TextEditingController();
+  final _widthController = TextEditingController();
+  final _lengthController = TextEditingController();
+  final List<String> objectTypes = ['Obstacle', 'Pallet'];
+  String selectedType = 'Obstacle';
+  final _typeController = TextEditingController(text: 'Obstacle');
+
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Takhzin App',
-      theme: ThemeData(
-        primaryColor: takhzinPrimary,
-        scaffoldBackgroundColor: Color(0xFFF9FAFB),
-        appBarTheme: AppBarTheme(
-          backgroundColor: takhzinPrimary,
-          iconTheme: IconThemeData(color: Colors.white),
-          titleTextStyle: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: takhzinPrimary,
-          primary: takhzinPrimary,
+    return Scaffold(
+      appBar: AppBar(title: Text('Warehouse')),
+      body: FutureBuilder<Warehouse>(
+        future: warehouseFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+            warehouse = snapshot.data!; // Initialize the warehouse variable
+            return Column(
+              children: [
+                Expanded(
+                  child: Center(
+                    child: WarehouseView(
+                      warehouse: warehouse,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          _buildField(_xController, 'X'),
+                          _buildField(_yController, 'Y'),
+                          _buildField(_widthController, 'Width'),
+                          _buildField(_lengthController, 'Length'),
+                          DropdownButton<String>(
+                            value: selectedType,
+                            items: objectTypes.map((String type) {
+                              return DropdownMenuItem<String>(
+                                value: type,
+                                child: Text(type),
+                              );
+                            }).toList(),
+                            onChanged: (String? newValue) {
+                              if (newValue != null) {
+                                setState(() {
+                                  selectedType = newValue;
+                                  _typeController.text = newValue;
+                                });
+                              }
+                            },
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              int x = int.tryParse(_xController.text) ?? 0;
+                              int y = int.tryParse(_yController.text) ?? 0;
+                              int w = int.tryParse(_widthController.text) ?? 1;
+                              int l = int.tryParse(_lengthController.text) ?? 1;
+                              String type = _typeController.text;
+                              _addObject(x, y, w, l, type);
+                            },
+                            child: Text('Apply'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            );
+          } else {
+            return Center(child: Text('No data available'));
+          }
+        },
+      ),
+    );
+  }
+
+  Widget _buildField(TextEditingController controller, String label) {
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4.0),
+        child: TextField(
+          controller: controller,
+          decoration: InputDecoration(labelText: label),
+          keyboardType: TextInputType.number,
         ),
       ),
-      home: WarehouseStatisticsPage(),
     );
   }
-
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Scaffold(
-  //     appBar: AppBar(
-  //       backgroundColor: Color(0xFFCF1D51), // Takhzin navbar color
-  //       elevation: 3,
-  //       centerTitle: true,
-  //       title: Row(
-  //         children: [
-  //           Icon(Icons.warehouse, color: Colors.white),
-  //           SizedBox(width: 12),
-  //           Text(
-  //             'Warehouse Statistics',
-  //             style: TextStyle(
-  //               color: Colors.white,
-  //               fontSize: 20,
-  //               fontWeight: FontWeight.w600,
-  //             ),
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //     body: Center(
-  //       // Center is a layout widget. It takes a single child and positions it
-  //       // in the middle of the parent.
-  //       child: Column(
-  //         // Column is also a layout widget. It takes a list of children and
-  //         // arranges them vertically. By default, it sizes itself to fit its
-  //         // children horizontally, and tries to be as tall as its parent.
-  //         //
-  //         // Column has various properties to control how it sizes itself and
-  //         // how it positions its children. Here we use mainAxisAlignment to
-  //         // center the children vertically; the main axis here is the vertical
-  //         // axis because Columns are vertical (the cross axis would be
-  //         // horizontal).
-  //         //
-  //         // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-  //         // action in the IDE, or press "p" in the console), to see the
-  //         // wireframe for each widget.
-  //         mainAxisAlignment: MainAxisAlignment.center,
-  //         children: <Widget>[
-  //           const Text('You have pushed the button this many times:'),
-  //           Text(
-  //             '$_counter',
-  //             style: Theme.of(context).textTheme.headlineMedium,
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //     floatingActionButton: FloatingActionButton(
-  //       onPressed: _incrementCounter,
-  //       tooltip: 'Increment',
-  //       child: const Icon(Icons.add),
-  //     ), // This trailing comma makes auto-formatting nicer for build methods.
-  //   );
-  // }
 }
