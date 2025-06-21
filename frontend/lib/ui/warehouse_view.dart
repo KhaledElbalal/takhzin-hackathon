@@ -68,7 +68,7 @@ class _WarehouseViewState extends State<WarehouseView> {
                 String selectedType = this.selectedType;
 
                 final newObj = WarehouseObject(
-                  id: '',
+                  id: 0,
                   warehouse: widget.warehouse.id,
                   objectType: selectedType,
                   width: width,
