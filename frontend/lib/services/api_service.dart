@@ -12,7 +12,7 @@ import '../models/product_instance.dart';
 class ApiService {
   final String baseUrl;
 
-  ApiService({this.baseUrl = 'http://10.0.2.2:8000/api'});
+  ApiService({this.baseUrl = 'https://9038-194-69-103-34.ngrok-free.app/api'});
 
   // Products
   Future<List<Product>> getProducts() async {
@@ -238,7 +238,9 @@ class ApiService {
   }
 
   Future<WarehouseObject> getWarehouseObject(String id) async {
-    final response = await http.get(Uri.parse('$baseUrl/warehouse-objects/$id/'));
+    final response = await http.get(
+      Uri.parse('$baseUrl/warehouse-objects/$id/'),
+    );
     if (response.statusCode == 200) {
       return WarehouseObject.fromJson(jsonDecode(response.body));
     } else {
@@ -273,7 +275,9 @@ class ApiService {
   }
 
   Future<void> deleteWarehouseObject(String id) async {
-    final response = await http.delete(Uri.parse('$baseUrl/warehouse-objects/$id/'));
+    final response = await http.delete(
+      Uri.parse('$baseUrl/warehouse-objects/$id/'),
+    );
     if (response.statusCode != 204) {
       throw Exception('Failed to delete warehouse object');
     }
@@ -291,7 +295,9 @@ class ApiService {
   }
 
   Future<ProductInstance> getProductInstance(String id) async {
-    final response = await http.get(Uri.parse('\$baseUrl/product-instances/\$id/'));
+    final response = await http.get(
+      Uri.parse('\$baseUrl/product-instances/\$id/'),
+    );
     if (response.statusCode == 200) {
       return ProductInstance.fromJson(jsonDecode(response.body));
     } else {
@@ -299,7 +305,9 @@ class ApiService {
     }
   }
 
-  Future<ProductInstance> createProductInstance(ProductInstance instance) async {
+  Future<ProductInstance> createProductInstance(
+    ProductInstance instance,
+  ) async {
     final response = await http.post(
       Uri.parse('\$baseUrl/product-instances/'),
       headers: {'Content-Type': 'application/json'},
@@ -312,7 +320,9 @@ class ApiService {
     }
   }
 
-  Future<ProductInstance> updateProductInstance(ProductInstance instance) async {
+  Future<ProductInstance> updateProductInstance(
+    ProductInstance instance,
+  ) async {
     final response = await http.put(
       Uri.parse('\$baseUrl/product-instances/\${instance.id}/'),
       headers: {'Content-Type': 'application/json'},
@@ -326,7 +336,9 @@ class ApiService {
   }
 
   Future<void> deleteProductInstance(String id) async {
-    final response = await http.delete(Uri.parse('\$baseUrl/product-instances/\$id/'));
+    final response = await http.delete(
+      Uri.parse('\$baseUrl/product-instances/\$id/'),
+    );
     if (response.statusCode != 204) {
       throw Exception('Failed to delete product instance');
     }
