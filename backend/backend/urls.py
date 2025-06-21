@@ -24,6 +24,7 @@ from warehouse.views import (
     PalletViewSet,
     WarehouseViewSet,
     WarehouseObjectViewSet,
+    ProductInstanceViewSet,
 )
 
 router = routers.DefaultRouter()
@@ -32,6 +33,7 @@ router.register(r'suppliers', SupplierViewSet)
 router.register(r'pallets', PalletViewSet)
 router.register(r'warehouses', WarehouseViewSet)
 router.register(r'warehouse-objects', WarehouseObjectViewSet)
+router.register(r'product-instances', ProductInstanceViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

@@ -1,12 +1,13 @@
 from rest_framework import viewsets
 
-from .models import Product, Supplier, Pallet, Warehouse, WarehouseObject
+from .models import Product, Supplier, Pallet, Warehouse, WarehouseObject, ProductInstance
 from .serializers import (
     ProductSerializer,
     SupplierSerializer,
     PalletSerializer,
     WarehouseSerializer,
     WarehouseObjectSerializer,
+    ProductInstanceSerializer,
 )
 from .permissions import Everyone
 
@@ -38,4 +39,10 @@ class WarehouseViewSet(viewsets.ModelViewSet):
 class WarehouseObjectViewSet(viewsets.ModelViewSet):
     queryset = WarehouseObject.objects.all()
     serializer_class = WarehouseObjectSerializer
+    permission_classes = [Everyone]
+
+
+class ProductInstanceViewSet(viewsets.ModelViewSet):
+    queryset = ProductInstance.objects.all()
+    serializer_class = ProductInstanceSerializer
     permission_classes = [Everyone]

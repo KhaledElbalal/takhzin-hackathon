@@ -7,6 +7,7 @@ import '../models/supplier.dart';
 import '../models/pallet.dart';
 import '../models/warehouse.dart';
 import '../models/warehouse_object.dart';
+import '../models/product_instance.dart';
 
 class ApiService {
   final String baseUrl;
@@ -275,6 +276,59 @@ class ApiService {
     final response = await http.delete(Uri.parse('$baseUrl/warehouse-objects/$id/'));
     if (response.statusCode != 204) {
       throw Exception('Failed to delete warehouse object');
+    }
+  }
+
+  // Product Instances
+  Future<List<ProductInstance>> getProductInstances() async {
+    final response = await http.get(Uri.parse('\$baseUrl/product-instances/'));
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body) as List;
+      return data.map((e) => ProductInstance.fromJson(e)).toList();
+    } else {
+      throw Exception('Failed to load product instances');
+    }
+  }
+
+  Future<ProductInstance> getProductInstance(String id) async {
+    final response = await http.get(Uri.parse('\$baseUrl/product-instances/\$id/'));
+    if (response.statusCode == 200) {
+      return ProductInstance.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Failed to load product instance');
+    }
+  }
+
+  Future<ProductInstance> createProductInstance(ProductInstance instance) async {
+    final response = await http.post(
+      Uri.parse('\$baseUrl/product-instances/'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(instance.toJson()),
+    );
+    if (response.statusCode == 201) {
+      return ProductInstance.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Failed to create product instance');
+    }
+  }
+
+  Future<ProductInstance> updateProductInstance(ProductInstance instance) async {
+    final response = await http.put(
+      Uri.parse('\$baseUrl/product-instances/\${instance.id}/'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(instance.toJson()),
+    );
+    if (response.statusCode == 200) {
+      return ProductInstance.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Failed to update product instance');
+    }
+  }
+
+  Future<void> deleteProductInstance(String id) async {
+    final response = await http.delete(Uri.parse('\$baseUrl/product-instances/\$id/'));
+    if (response.statusCode != 204) {
+      throw Exception('Failed to delete product instance');
     }
   }
 }

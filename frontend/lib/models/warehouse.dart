@@ -5,14 +5,14 @@ class Warehouse {
   final String name;
   final int width;
   final int length;
-  final List<WarehouseObject> objects;
+  final List<WarehouseObject> warehouseObjects;
 
   Warehouse({
     required this.id,
     required this.name,
     required this.width,
     required this.length,
-    required this.objects,
+    required this.warehouseObjects,
   });
 
   factory Warehouse.fromJson(Map<String, dynamic> json) => Warehouse(
@@ -20,7 +20,7 @@ class Warehouse {
         name: json['name'] as String,
         width: json['width'] as int,
         length: json['length'] as int,
-        objects: (json['objects'] as List)
+        warehouseObjects: (json['warehouse_objects'] as List)
             .map((e) => WarehouseObject.fromJson(e as Map<String, dynamic>))
             .toList(),
       );

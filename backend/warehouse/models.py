@@ -8,7 +8,6 @@ class Product(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     max_boxes_per_pallet = models.IntegerField()
-    expiry_date = models.DateField()
 
     def save(self, *args, **kwargs):
         if not self.sku:
@@ -23,19 +22,24 @@ class Product(models.Model):
             self.sku = f"SKU-{num + 1:09d}"
         super().save(*args, **kwargs)
 
+
+class ProductInstance(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="instances")
+    production_date = models.DateField(null=True, blank=True)
+    batch_number = models.CharField(max_length=50, null=True, blank=True)
+    expiry_date = models.DateField(null=True, blank=True)
+
+
 class Supplier(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
 
 class Pallet(models.Model):
-    STATUS_CHOICES = [
-        ('full', 'Full'),
-        ('empty', 'Empty'),
-        ('partial', 'Partial'),
-    ]
-
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    status = models.CharField(max_length=7, choices=STATUS_CHOICES)
+    id = models.IntegerField(primary_key=True)
+    product_instance = models.ForeignKey(
+        ProductInstance, related_name='pallets', on_delete=models.CASCADE
+    )
     reserved = models.BooleanField(default=False)
     reserved_customer = models.UUIDField(null=True, blank=True)
     supplier = models.ForeignKey(
