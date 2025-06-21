@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Warehouse Layout</title>
+  <style>
+    canvas {
+      border: 1px solid #000;
+      background-color: #f8f8f8;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="warehouseCanvas" width="1000" height="1200"></canvas>
+  <script>
+    const canvas = document.getElementById('warehouseCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Scale factor (warehouse is 5000x6000, canvas is 1000x1200)
+    const scaleX = 1000 / 5000;
+    const scaleY = 1200 / 6000;
+
+    // Draw function
+    function drawRect(x, y, width, length, color) {
+      ctx.fillStyle = color;
+      ctx.fillRect(x * scaleX, y * scaleY, width * scaleX, length * scaleY);
+      ctx.strokeRect(x * scaleX, y * scaleY, width * scaleX, length * scaleY);
+    }
+
+    // Objects
+    const objects = [
+      { type: 'pallet', x: 0, y: 0, width: 100, length: 120 },
+      { type: 'pallet', x: 150, y: 0, width: 100, length: 120 },
+      { type: 'pallet', x: 300, y: 0, width: 100, length: 120 },
+      { type: 'pallet', x: 1350, y: 1350, width: 100, length: 120 },
+      { type: 'obstacle', x: 2000, y: 500, width: 80, length: 80 },
+      { type: 'obstacle', x: 3000, y: 800, width: 90, length: 90 },
+      { type: 'road', x: 4700, y: 0, width: 300, length: 6000 },
+    ];
+
+    // Color mapping
+    const colorMap = {
+      pallet: 'green',
+      obstacle: 'black',
+      road: 'gray',
+    };
+
+    // Draw all objects
+    objects.forEach(obj => drawRect(obj.x, obj.y, obj.width, obj.length, colorMap[obj.type]));
+  </script>
+</body>
+</html>

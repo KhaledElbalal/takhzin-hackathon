@@ -5,13 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ed361fd5-5f71-4209-849f-4372ec537195" name="Changes" comment="Added models and their flutter representation">
-      <change beforePath="$PROJECT_DIR$/backend/backend/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/backend/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/backend/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/backend/settings.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/backend/db.sqlite3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/warehouse/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/warehouse/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/warehouse/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/warehouse/serializers.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/warehouse/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/warehouse/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/lib/models/pallet.dart" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/lib/models/pallet.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/lib/models/product.dart" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/lib/models/product.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

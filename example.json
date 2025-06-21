@@ -1,0 +1,56 @@
+{
+  "name": "Mega Warehouse Zone 1",
+  "width": 5000,
+  "length": 6000,
+  "warehouse_objects": [
+    {
+      "object_type": "pallet",
+      "width": 100,
+      "length": 120,
+      "x": 100,
+      "y": 100
+    },
+    {
+      "object_type": "pallet",
+      "width": 100,
+      "length": 120,
+      "x": 220,
+      "y": 100
+    },
+    {
+      "object_type": "pallet",
+      "width": 100,
+      "length": 120,
+      "x": 340,
+      "y": 100
+    },
+    {
+      "object_type": "obstacle",
+      "width": 60,
+      "length": 80,
+      "x": 800,
+      "y": 300
+    },
+    {
+      "object_type": "obstacle",
+      "width": 90,
+      "length": 90,
+      "x": 1200,
+      "y": 1000
+    },
+    {
+      "object_type": "road",
+      "width": 300,
+      "length": 6000,
+      "x": 2000,
+      "y": 0
+    },
+    {
+      "object_type": "road",
+      "width": 5000,
+      "length": 300,
+      "x": 0,
+      "y": 3000
+    }
+  ]
+}
