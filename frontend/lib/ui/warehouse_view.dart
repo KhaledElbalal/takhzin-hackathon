@@ -5,8 +5,10 @@ import '../services/api_service.dart';
 
 class WarehouseView extends StatefulWidget {
   final Warehouse warehouse;
+  final bool allowEdit;
 
-  const WarehouseView({required this.warehouse, Key? key}) : super(key: key);
+  const WarehouseView({required this.warehouse, this.allowEdit = false, Key? key})
+      : super(key: key);
 
   @override
   State<WarehouseView> createState() => _WarehouseViewState();
@@ -65,7 +67,7 @@ class _WarehouseViewState extends State<WarehouseView> {
               onPressed: () async {
                 int width = int.tryParse(widthController.text) ?? 1;
                 int length = int.tryParse(lengthController.text) ?? 1;
-                String selectedType = this.selectedType;
+                String selectedType = this.selectedType.toLowerCase();
 
                 final newObj = WarehouseObject(
                   id: '',
@@ -100,9 +102,12 @@ class _WarehouseViewState extends State<WarehouseView> {
 
     return GestureDetector(
       onTapDown: (details) {
-        int tappedX = (details.localPosition.dx / scaleX).floor();
-        int tappedY = ((canvasSize - details.localPosition.dy) / scaleY).floor();
-        _showAddDialog(tappedX, tappedY);
+        if (widget.allowEdit) {
+          int tappedX = (details.localPosition.dx / scaleX).floor();
+          int tappedY =
+              ((canvasSize - details.localPosition.dy) / scaleY).floor();
+          _showAddDialog(tappedX, tappedY);
+        }
       },
       child: Container(
         width: canvasSize,
@@ -110,13 +115,39 @@ class _WarehouseViewState extends State<WarehouseView> {
         decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
         child: Stack(
           children: widget.warehouse.warehouseObjects.map((obj) {
+            Color color;
+            switch (obj.objectType.toLowerCase()) {
+              case 'pallet':
+                color = Colors.green;
+                break;
+              case 'road':
+                color = Colors.brown;
+                break;
+              default:
+                color = Colors.grey.shade800;
+            }
+
             return Positioned(
               left: obj.x * scaleX,
               top: canvasSize - (obj.y + obj.length) * scaleY,
-              width: obj.width * scaleX,
-              height: obj.length * scaleY,
-              child: Container(
-                color: obj.objectType == 'Pallet' ? Colors.green : Colors.black,
+              width: (obj.width * scaleX).clamp(10, double.infinity),
+              height: (obj.length * scaleY).clamp(10, double.infinity),
+              child: GestureDetector(
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (_) => AlertDialog(
+                      title: Text('Object Details'),
+                      content: Text(
+                          'Type: ${obj.objectType}\nSize: ${obj.width}x${obj.length}\nPosition: (${obj.x}, ${obj.y})'),
+                    ),
+                  );
+                },
+                child: Tooltip(
+                  message:
+                      'Type: ${obj.objectType}\n${obj.width}x${obj.length} at (${obj.x}, ${obj.y})',
+                  child: Container(color: color),
+                ),
               ),
             );
           }).toList(),

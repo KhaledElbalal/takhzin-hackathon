@@ -1,4 +1,3 @@
-import 'dart:ffi';
 
 class Pallet {
   final int id;

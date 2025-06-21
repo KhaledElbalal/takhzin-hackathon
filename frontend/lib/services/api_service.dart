@@ -12,7 +12,7 @@ import '../models/product_instance.dart';
 class ApiService {
   final String baseUrl;
 
-  ApiService({this.baseUrl = 'https://9038-194-69-103-34.ngrok-free.app/api'});
+  ApiService({this.baseUrl = 'http://localhost:8000/api'});
 
   // Products
   Future<List<Product>> getProducts() async {
