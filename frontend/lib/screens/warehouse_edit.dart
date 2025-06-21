@@ -1,32 +1,19 @@
-// main.dart
 import 'package:flutter/material.dart';
 import 'package:hackathon/services/api_service.dart';
 import 'package:hackathon/ui/warehouse_view.dart';
-import 'models/warehouse.dart';
-import 'models/warehouse_object.dart';
+import '../models/warehouse.dart';
+import '../models/warehouse_object.dart';
 
+class WarehouseEditPage extends StatefulWidget {
+  final String warehouseId;
 
-void main() {
-  runApp(MyApp());
-}
+  const WarehouseEditPage({required this.warehouseId, Key? key}) : super(key: key);
 
-class MyApp extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Warehouse Viewer',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: WarehouseScreen(),
-    );
-  }
+  _WarehouseEditPageState createState() => _WarehouseEditPageState();
 }
 
-class WarehouseScreen extends StatefulWidget {
-  @override
-  _WarehouseScreenState createState() => _WarehouseScreenState();
-}
-
-class _WarehouseScreenState extends State<WarehouseScreen> {
+class _WarehouseEditPageState extends State<WarehouseEditPage> {
   final ApiService apiService = ApiService();
   late Future<Warehouse> warehouseFuture;
   late Warehouse warehouse;
@@ -34,7 +21,7 @@ class _WarehouseScreenState extends State<WarehouseScreen> {
   @override
   void initState() {
     super.initState();
-    warehouseFuture = apiService.getWarehouse("32ef7f79-f154-43ba-8be1-7a1db92da430");
+    warehouseFuture = apiService.getWarehouse(widget.warehouseId);
     warehouseFuture.then((value) {
       setState(() {
         warehouse = value;
@@ -43,7 +30,7 @@ class _WarehouseScreenState extends State<WarehouseScreen> {
   }
   void _addObject(int x, int y, int width, int length, String type) {
     final newObj = WarehouseObject(
-      id: DateTime.now().toIso8601String(),
+      id: 0,
       warehouse: warehouse.id,
       objectType: type,
       width: width,
@@ -77,7 +64,8 @@ class _WarehouseScreenState extends State<WarehouseScreen> {
             return Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
-            warehouse = snapshot.data!; // Initialize the warehouse variable
+          } else if (snapshot.hasData) {
+            warehouse = snapshot.data!;
             return Column(
               children: [
                 Expanded(
