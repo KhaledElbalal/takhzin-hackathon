@@ -1,4 +1,4 @@
-name: Build and Deploy Container to Azure Web App - takhzin-hackathon
+name: Build and deploy Python app with Flutter frontend to Azure Web App - takhzin-hackathon
 
 on:
   push:
@@ -6,36 +6,54 @@ on:
       - main
   workflow_dispatch:
 
-env:
-  REGISTRY: ${{ secrets.ACR_LOGIN_SERVER }}
-  IMAGE_NAME: flutter-django-app
-
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Login to Azure
-        uses: azure/login@v1
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_7AAC7DC895674874B56155863CD8B7CB }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_C7CF2820F17D406FB997A25D77E6FF29 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_9EB1F709B754489CA109A0286AF5B385 }}
+          python-version: '3.12'
 
-      - name: Login to Azure Container Registry
-        uses: azure/docker-login@v1
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
         with:
-          login-server: ${{ env.REGISTRY }}
-          username: ${{ secrets.ACR_USERNAME }}
-          password: ${{ secrets.ACR_PASSWORD }}
+          flutter-version: '3.19.5'  # Set your desired version
+          channel: 'stable'
 
-      - name: Build and push container
+      - name: Create Python virtual environment
         run: |
-          docker build -t $REGISTRY/$IMAGE_NAME:${{ github.sha }} .
-          docker push $REGISTRY/$IMAGE_NAME:${{ github.sha }}
+          python -m venv venv
+          source venv/bin/activate
+
+      - name: Install Python dependencies
+        run: pip install -r backend/requirements.txt
+
+      - name: Build Flutter web app
+        working-directory: ./frontend
+        run: flutter build web
+
+      - name: Copy Flutter build output to Django static directory
+        run: |
+          mkdir -p backend/static/frontend
+          cp -r frontend/build/web/* backend/static/frontend/
+
+      - name: Zip deployment package
+        run: |
+          zip release.zip ./* -r -x "venv/*"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-app
+          path: |
+            release.zip
+            !venv/
 
   deploy:
     runs-on: ubuntu-latest
@@ -46,17 +64,26 @@ jobs:
     permissions:
       id-token: write
       contents: read
+
     steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: python-app
+
+      - name: Unzip artifact
+        run: unzip release.zip
+
       - name: Login to Azure
-        uses: azure/login@v1
+        uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_7AAC7DC895674874B56155863CD8B7CB }}
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_C7CF2820F17D406FB997A25D77E6FF29 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_9EB1F709B754489CA109A0286AF5B385 }}
 
       - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
-        uses: azure/webapps-deploy@v2
         with:
           app-name: 'takhzin-hackathon'
-          images: ${{ env.REGISTRY }}/$IMAGE_NAME:${{ github.sha }}
+          slot-name: 'Production'
