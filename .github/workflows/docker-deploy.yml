@@ -18,8 +18,10 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_7AAC7DC895674874B56155863CD8B7CB }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_C7CF2820F17D406FB997A25D77E6FF29 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_9EB1F709B754489CA109A0286AF5B385  }}
+      
       - name: Login to ACR
         uses: azure/docker-login@v1
         with:
