@@ -40,7 +40,7 @@ class PalletViewSet(viewsets.ModelViewSet):
         return Response(PalletSerializer(pallets, many=True).data)
 
     @action(detail=True, methods=['post'])
-    def dispatch(self, request, pk=None):
+    def dispatch_pallet(self, request, pk=None):
         pallet = self.get_object()
         pallet.product_instance = None
         pallet.reserved = False

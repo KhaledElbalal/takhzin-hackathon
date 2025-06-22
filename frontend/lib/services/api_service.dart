@@ -184,7 +184,8 @@ class ApiService {
   }
 
   Future<void> dispatchPallet(int id) async {
-    final response = await http.post(Uri.parse('$baseUrl/pallets/$id/dispatch/'));
+    final response =
+        await http.post(Uri.parse('$baseUrl/pallets/$id/dispatch_pallet/'));
     if (response.statusCode != 200) {
       throw Exception('Failed to dispatch pallet');
     }
