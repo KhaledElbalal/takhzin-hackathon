@@ -38,7 +38,18 @@ class Supplier(models.Model):
 class Pallet(models.Model):
     id = models.IntegerField(primary_key=True)
     product_instance = models.ForeignKey(
-        ProductInstance, related_name='pallets', on_delete=models.CASCADE
+        ProductInstance,
+        related_name='pallets',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+    warehouse_object = models.OneToOneField(
+        'WarehouseObject',
+        related_name='pallet',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
     )
     reserved = models.BooleanField(default=False)
     reserved_customer = models.UUIDField(null=True, blank=True)

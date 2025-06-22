@@ -31,6 +31,23 @@ class PalletViewSet(viewsets.ModelViewSet):
     serializer_class = PalletSerializer
     permission_classes = [Everyone]
 
+    @action(detail=False, methods=['get'])
+    def by_sku(self, request):
+        sku = request.query_params.get('sku')
+        if not sku:
+            return Response({'error': 'SKU is required.'}, status=400)
+        pallets = Pallet.objects.filter(product_instance__product__sku=sku)
+        return Response(PalletSerializer(pallets, many=True).data)
+
+    @action(detail=True, methods=['post'])
+    def dispatch_pallet(self, request, pk=None):
+        pallet = self.get_object()
+        pallet.product_instance = None
+        pallet.reserved = False
+        pallet.reserved_customer = None
+        pallet.save()
+        return Response({'message': 'Pallet dispatched'}, status=200)
+
 
 class WarehouseViewSet(viewsets.ModelViewSet):
     queryset = Warehouse.objects.all()
@@ -50,7 +67,7 @@ class WarehouseObjectViewSet(viewsets.ModelViewSet):
         warehouse_object = self.get_object()
         empty_pallets = Pallet.objects.filter(
             product_instance__isnull=True,
-            product_instance__pallet__warehouse=warehouse_object.warehouse
+            warehouse_object__warehouse=warehouse_object.warehouse
         )
         if not sku or not number_of_boxes:
             return Response({'error': 'SKU and number of boxes are required.'}, status=400)
@@ -69,8 +86,11 @@ class WarehouseObjectViewSet(viewsets.ModelViewSet):
         number_of_boxes = request.data.get('number_of_boxes')
         list_of_pallets = request.data.get('list_of_pallets', [])
 
-        with Pallet.objects.select_for_update().using('default').defer('reserved_customer').filter(id__in=list_of_pallets) as pallets:
-            warehouse_object = self.get_object()
+        warehouse_object = self.get_object()
+        with Pallet.objects.select_for_update().using('default').defer('reserved_customer').filter(
+            id__in=list_of_pallets,
+            warehouse_object__warehouse=warehouse_object.warehouse,
+        ) as pallets:
             product = Product.objects.filter(sku=sku).first()
             if not product:
                 return Response({'error': 'Product not found.'}, status=404)
@@ -87,7 +107,11 @@ class WarehouseObjectViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'])
     def releasePallets(self, request, pk=None):
         list_of_pallets = request.data.get('list_of_pallets', [])
-        with Pallet.objects.select_for_update().using('default').filter(id__in=list_of_pallets) as pallets:
+        warehouse_object = self.get_object()
+        with Pallet.objects.select_for_update().using('default').filter(
+            id__in=list_of_pallets,
+            warehouse_object__warehouse=warehouse_object.warehouse,
+        ) as pallets:
             for pallet in pallets:
                 if pallet.reserved and pallet.reserved_customer == request.user.id:
                     pallet.reserved = False
@@ -108,7 +132,8 @@ class WarehouseObjectViewSet(viewsets.ModelViewSet):
             product_instance__isnull=False,
             product_instance__product=product,
             reserved=True,
-            reserved_customer=request.user.id
+            reserved_customer=request.user.id,
+            warehouse_object__warehouse=warehouse_object.warehouse
         )
         reserved_pallet_ids = reserved_pallets.values_list('id', flat=True)
         return Response({'reserved_pallets': list(reserved_pallet_ids)}, status=200)
