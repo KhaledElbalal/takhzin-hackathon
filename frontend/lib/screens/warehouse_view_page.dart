@@ -1,5 +1,5 @@
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:hackathon/screens/product_search_page.dart';
 import 'package:hackathon/services/api_service.dart';
 import 'package:hackathon/ui/warehouse_view.dart';
 import '../models/warehouse.dart';
@@ -50,7 +50,18 @@ class _WarehouseViewPageState extends State<WarehouseViewPage> {
                 MaterialPageRoute(builder: (_) => WarehouseStatisticsPage()),
               );
             },
-          )
+          ),
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ProductSearchPage(),
+                ),
+              );
+            },
+          ),
         ],
       ),
       body: FutureBuilder<Warehouse>(
@@ -62,38 +73,18 @@ class _WarehouseViewPageState extends State<WarehouseViewPage> {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (snapshot.hasData) {
             final warehouse = snapshot.data!;
-            return SingleChildScrollView(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Column(
-                        children: [
-                          Center(
-                            child: WarehouseView(
-                              warehouse: warehouse,
-                              allowEdit: false,
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          FutureBuilder<Uint8List>(
-                            future: apiService.getWarehouseHeatmap(warehouse.id),
-                            builder: (context, heatmapSnap) {
-                              if (heatmapSnap.connectionState == ConnectionState.waiting) {
-                                return const CircularProgressIndicator();
-                              } else if (heatmapSnap.hasError) {
-                                return const Text('Error loading heatmap');
-                              } else if (heatmapSnap.hasData) {
-                                return Image.memory(heatmapSnap.data!);
-                              } else {
-                                return const SizedBox.shrink();
-                              }
-                            },
-                          ),
-                        ],
-                      ),
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Center(
+                    child: WarehouseView(
+                      warehouse: warehouse,
+                      allowEdit: false,
                     ),
-                  Container(
+                  ),
+                ),
+                Container(
                   width: 250,
                   color: Colors.grey.shade200,
                   child: Padding(
@@ -123,9 +114,9 @@ class _WarehouseViewPageState extends State<WarehouseViewPage> {
                               child: TextButton(
                                 style: TextButton.styleFrom(
                                   backgroundColor:
-                                      mode == _SidePanelMode.dispatch
-                                          ? Colors.grey.shade200
-                                          : Colors.white.withOpacity(0.5),
+                                  mode == _SidePanelMode.dispatch
+                                      ? Colors.grey.shade200
+                                      : Colors.white.withOpacity(0.5),
                                 ),
                                 onPressed: () {
                                   setState(() {
@@ -159,7 +150,7 @@ class _WarehouseViewPageState extends State<WarehouseViewPage> {
                                         warehouse.id, sku, boxes);
                                     setState(() {
                                       availablePallets =
-                                          List<int>.from(res['empty_pallets'] ?? []);
+                                      List<int>.from(res['empty_pallets'] ?? []);
                                       selectedPallets = [];
                                       validationText = availablePallets.join(', ');
                                     });
@@ -181,23 +172,23 @@ class _WarehouseViewPageState extends State<WarehouseViewPage> {
                                 onPressed: selectedPallets.isEmpty
                                     ? null
                                     : () async {
-                                        final boxes =
-                                            int.tryParse(boxesController.text) ?? 0;
-                                        try {
-                                          await apiService.reserveWarehousePallets(
-                                              warehouse.id,
-                                              skuController.text,
-                                              boxes,
-                                              selectedPallets);
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                              const SnackBar(
-                                                  content: Text('Pallets reserved')));
-                                        } catch (_) {
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                              const SnackBar(
-                                                  content: Text('Reserve failed')));
-                                        }
-                                      },
+                                  final boxes =
+                                      int.tryParse(boxesController.text) ?? 0;
+                                  try {
+                                    await apiService.reserveWarehousePallets(
+                                        warehouse.id,
+                                        skuController.text,
+                                        boxes,
+                                        selectedPallets);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                            content: Text('Pallets reserved')));
+                                  } catch (_) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                            content: Text('Reserve failed')));
+                                  }
+                                },
                                 child: const Text('Reserve'),
                               ),
                             ],
@@ -209,19 +200,19 @@ class _WarehouseViewPageState extends State<WarehouseViewPage> {
                               children: availablePallets
                                   .map(
                                     (id) => CheckboxListTile(
-                                      title: Text('Pallet $id'),
-                                      value: selectedPallets.contains(id),
-                                      onChanged: (v) {
-                                        setState(() {
-                                          if (v == true) {
-                                            selectedPallets.add(id);
-                                          } else {
-                                            selectedPallets.remove(id);
-                                          }
-                                        });
-                                      },
-                                    ),
-                                  )
+                                  title: Text('Pallet $id'),
+                                  value: selectedPallets.contains(id),
+                                  onChanged: (v) {
+                                    setState(() {
+                                      if (v == true) {
+                                        selectedPallets.add(id);
+                                      } else {
+                                        selectedPallets.remove(id);
+                                      }
+                                    });
+                                  },
+                                ),
+                              )
                                   .toList(),
                             ),
                           )
@@ -252,19 +243,19 @@ class _WarehouseViewPageState extends State<WarehouseViewPage> {
                               children: dispatchPallets
                                   .map(
                                     (p) => CheckboxListTile(
-                                      title: Text('Pallet ${p.id}'),
-                                      value: dispatchSelected.contains(p.id),
-                                      onChanged: (v) {
-                                        setState(() {
-                                          if (v == true) {
-                                            dispatchSelected.add(p.id);
-                                          } else {
-                                            dispatchSelected.remove(p.id);
-                                          }
-                                        });
-                                      },
-                                    ),
-                                  )
+                                  title: Text('Pallet ${p.id}'),
+                                  value: dispatchSelected.contains(p.id),
+                                  onChanged: (v) {
+                                    setState(() {
+                                      if (v == true) {
+                                        dispatchSelected.add(p.id);
+                                      } else {
+                                        dispatchSelected.remove(p.id);
+                                      }
+                                    });
+                                  },
+                                ),
+                              )
                                   .toList(),
                             ),
                           ),
@@ -272,16 +263,16 @@ class _WarehouseViewPageState extends State<WarehouseViewPage> {
                             onPressed: dispatchSelected.isEmpty
                                 ? null
                                 : () async {
-                                    for (final id in dispatchSelected) {
-                                      await apiService.dispatchPallet(id);
-                                    }
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text('Dispatched')));
-                                    setState(() {
-                                      dispatchPallets = [];
-                                      dispatchSelected = [];
-                                    });
-                                  },
+                              for (final id in dispatchSelected) {
+                                await apiService.dispatchPallet(id);
+                              }
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('Dispatched')));
+                              setState(() {
+                                dispatchPallets = [];
+                                dispatchSelected = [];
+                              });
+                            },
                             child: const Text('Dispatch'),
                           )
                         ]
