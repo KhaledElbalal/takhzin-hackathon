@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:hackathon/services/api_service.dart';
 import 'package:hackathon/ui/warehouse_view.dart';
@@ -61,17 +62,38 @@ class _WarehouseViewPageState extends State<WarehouseViewPage> {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (snapshot.hasData) {
             final warehouse = snapshot.data!;
-            return Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Center(
-                    child: WarehouseView(
-                      warehouse: warehouse,
-                      allowEdit: false,
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          Center(
+                            child: WarehouseView(
+                              warehouse: warehouse,
+                              allowEdit: false,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          FutureBuilder<Uint8List>(
+                            future: apiService.getWarehouseHeatmap(warehouse.id),
+                            builder: (context, heatmapSnap) {
+                              if (heatmapSnap.connectionState == ConnectionState.waiting) {
+                                return const CircularProgressIndicator();
+                              } else if (heatmapSnap.hasError) {
+                                return const Text('Error loading heatmap');
+                              } else if (heatmapSnap.hasData) {
+                                return Image.memory(heatmapSnap.data!);
+                              } else {
+                                return const SizedBox.shrink();
+                              }
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
                 Container(
                   width: 250,
                   color: Colors.grey.shade200,

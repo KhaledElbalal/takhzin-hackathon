@@ -1,6 +1,7 @@
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from django.http import HttpResponse
 
 from .models import Product, Supplier, Pallet, Warehouse, WarehouseObject, ProductInstance
 from .serializers import (
@@ -53,6 +54,37 @@ class WarehouseViewSet(viewsets.ModelViewSet):
     queryset = Warehouse.objects.all()
     serializer_class = WarehouseSerializer
     permission_classes = [Everyone]
+
+    @action(detail=True, methods=["get"])
+    def heatmap(self, request, pk=None):
+        """Return a PNG heatmap for the selected warehouse."""
+        warehouse = self.get_object()
+        scale = 5
+        width = max(1, warehouse.width // scale)
+        length = max(1, warehouse.length // scale)
+
+        import numpy as np
+        import matplotlib
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+        import io
+
+        data = np.random.rand(length, width)
+        fig, ax = plt.subplots(figsize=(warehouse.width / 100, warehouse.length / 100))
+        ax.imshow(
+            data,
+            cmap="coolwarm",
+            origin="lower",
+            extent=[0, warehouse.width, 0, warehouse.length],
+            aspect="auto",
+        )
+        ax.set_axis_off()
+
+        buf = io.BytesIO()
+        plt.savefig(buf, format="png", bbox_inches="tight", pad_inches=0)
+        plt.close(fig)
+        buf.seek(0)
+        return HttpResponse(buf.getvalue(), content_type="image/png")
 
 
 class WarehouseObjectViewSet(viewsets.ModelViewSet):
