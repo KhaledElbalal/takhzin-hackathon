@@ -1,6 +1,7 @@
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from django.http import HttpResponse
 
 from .models import Product, Supplier, Pallet, Warehouse, WarehouseObject, ProductInstance
 from .serializers import (
@@ -53,6 +54,50 @@ class WarehouseViewSet(viewsets.ModelViewSet):
     queryset = Warehouse.objects.all()
     serializer_class = WarehouseSerializer
     permission_classes = [Everyone]
+
+    @action(detail=True, methods=["get"])
+    def heatmap(self, request, pk=None):
+        """Return a smoothly generated PNG heatmap for the selected warehouse."""
+        warehouse = self.get_object()
+        scale = 5
+        width = max(120, warehouse.width // scale)
+        length = max(100, warehouse.length // scale)
+
+        import numpy as np
+        import matplotlib
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+        import io
+
+        x = np.arange(width)
+        y = np.arange(length)
+        xv, yv = np.meshgrid(x, y)
+        data = np.zeros((length, width))
+        num_peaks = 4
+        sigma = min(width, length) / 4
+        for _ in range(num_peaks):
+            cx = np.random.uniform(0, width)
+            cy = np.random.uniform(0, length)
+            amplitude = np.random.uniform(0.5, 1.0)
+            data += amplitude * np.exp(-((xv - cx) ** 2 + (yv - cy) ** 2) / (2 * sigma ** 2))
+        if data.max() > 0:
+            data /= data.max()
+
+        fig, ax = plt.subplots(figsize=(warehouse.width / 100, warehouse.length / 100))
+        ax.imshow(
+            data,
+            cmap="coolwarm",
+            origin="lower",
+            extent=[0, warehouse.width, 0, warehouse.length],
+            aspect="auto",
+        )
+        ax.set_axis_off()
+
+        buf = io.BytesIO()
+        plt.savefig(buf, format="png", bbox_inches="tight", pad_inches=0)
+        plt.close(fig)
+        buf.seek(0)
+        return HttpResponse(buf.getvalue(), content_type="image/png")
 
 
 class WarehouseObjectViewSet(viewsets.ModelViewSet):
