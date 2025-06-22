@@ -34,9 +34,16 @@ class PalletSerializer(serializers.ModelSerializer):
 
 
 class WarehouseObjectSerializer(serializers.ModelSerializer):
+    pallet = PalletSerializer(read_only=True)
+    product_instance = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = WarehouseObject
         fields = '__all__'
+
+    def get_product_instance(self, obj):
+        if obj.object_type == 'pallet' and hasattr(obj, 'pallet') and obj.pallet.product_instance:
+            return ProductInstanceSerializer(obj.pallet.product_instance).data
+        return None
 
     def validate(self, data):
         warehouse = data.get('warehouse')

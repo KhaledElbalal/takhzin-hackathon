@@ -173,6 +173,23 @@ class ApiService {
     }
   }
 
+  Future<List<Pallet>> getPalletsBySku(String sku) async {
+    final response = await http.get(Uri.parse('$baseUrl/pallets/by_sku/?sku=$sku'));
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body) as List;
+      return data.map((e) => Pallet.fromJson(e)).toList();
+    } else {
+      throw Exception('Failed to load pallets');
+    }
+  }
+
+  Future<void> dispatchPallet(int id) async {
+    final response = await http.post(Uri.parse('$baseUrl/pallets/$id/dispatch/'));
+    if (response.statusCode != 200) {
+      throw Exception('Failed to dispatch pallet');
+    }
+  }
+
   // Warehouses
   Future<List<Warehouse>> getWarehouses() async {
     final response = await http.get(Uri.parse('$baseUrl/warehouses/'));
@@ -225,6 +242,36 @@ class ApiService {
     final response = await http.delete(Uri.parse('$baseUrl/warehouses/$id/'));
     if (response.statusCode != 204) {
       throw Exception('Failed to delete warehouse');
+    }
+  }
+
+  Future<Map<String, dynamic>> validateWarehouseSpace(
+      String warehouseId, String sku, int numberOfBoxes) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/warehouses/$warehouseId/validateSpace/'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'sku': sku, 'number_of_boxes': numberOfBoxes}),
+    );
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body) as Map<String, dynamic>;
+    } else {
+      throw Exception('Validation failed');
+    }
+  }
+
+  Future<void> reserveWarehousePallets(String warehouseId, String sku,
+      int numberOfBoxes, List<int> pallets) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/warehouses/$warehouseId/reservePallets/'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'sku': sku,
+        'number_of_boxes': numberOfBoxes,
+        'list_of_pallets': pallets,
+      }),
+    );
+    if (response.statusCode != 200) {
+      throw Exception('Failed to reserve pallets');
     }
   }
 
