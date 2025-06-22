@@ -15,7 +15,6 @@ class WarehouseView extends StatefulWidget {
 }
 
 class _WarehouseViewState extends State<WarehouseView> {
-  final double canvasSize = 1200;
   final ApiService apiService = ApiService();
   String selectedType = 'Pallet';
   final List<String> objectTypes = ['Pallet', 'Obstacle'];
@@ -97,21 +96,26 @@ class _WarehouseViewState extends State<WarehouseView> {
 
   @override
   Widget build(BuildContext context) {
-    double scaleX = canvasSize / widget.warehouse.width;
-    double scaleY = canvasSize / widget.warehouse.length;
+    double availableWidth = MediaQuery.of(context).size.width - 260;
+    if (availableWidth < 300) availableWidth = 300;
+    double scale = availableWidth / widget.warehouse.width;
+    double canvasWidth = availableWidth;
+    double canvasHeight = widget.warehouse.length * scale;
+    double scaleX = scale;
+    double scaleY = scale;
 
     return GestureDetector(
       onTapDown: (details) {
         if (widget.allowEdit) {
           int tappedX = (details.localPosition.dx / scaleX).floor();
           int tappedY =
-              ((canvasSize - details.localPosition.dy) / scaleY).floor();
+              ((canvasHeight - details.localPosition.dy) / scaleY).floor();
           _showAddDialog(tappedX, tappedY);
         }
       },
       child: Container(
-        width: canvasSize,
-        height: canvasSize,
+        width: canvasWidth,
+        height: canvasHeight,
         decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
         child: Stack(
           children: widget.warehouse.warehouseObjects.map((obj) {
@@ -129,7 +133,7 @@ class _WarehouseViewState extends State<WarehouseView> {
 
             return Positioned(
               left: obj.x * scaleX,
-              top: canvasSize - (obj.y + obj.length) * scaleY,
+              top: canvasHeight - (obj.y + obj.length) * scaleY,
               width: (obj.width * scaleX).clamp(10, double.infinity),
               height: (obj.length * scaleY).clamp(10, double.infinity),
               child: GestureDetector(

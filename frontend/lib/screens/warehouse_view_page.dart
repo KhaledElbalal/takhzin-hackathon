@@ -62,12 +62,12 @@ class _WarehouseViewPageState extends State<WarehouseViewPage> {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (snapshot.hasData) {
             final warehouse = snapshot.data!;
-              return Row(
+            return SingleChildScrollView(
+              child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    child: SingleChildScrollView(
-                      child: Column(
+                    child: Column(
                         children: [
                           Center(
                             child: WarehouseView(

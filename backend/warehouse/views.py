@@ -57,11 +57,11 @@ class WarehouseViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["get"])
     def heatmap(self, request, pk=None):
-        """Return a PNG heatmap for the selected warehouse."""
+        """Return a smoothly generated PNG heatmap for the selected warehouse."""
         warehouse = self.get_object()
         scale = 5
-        width = max(1, warehouse.width // scale)
-        length = max(1, warehouse.length // scale)
+        width = max(120, warehouse.width // scale)
+        length = max(100, warehouse.length // scale)
 
         import numpy as np
         import matplotlib
@@ -69,7 +69,20 @@ class WarehouseViewSet(viewsets.ModelViewSet):
         import matplotlib.pyplot as plt
         import io
 
-        data = np.random.rand(length, width)
+        x = np.arange(width)
+        y = np.arange(length)
+        xv, yv = np.meshgrid(x, y)
+        data = np.zeros((length, width))
+        num_peaks = 4
+        sigma = min(width, length) / 4
+        for _ in range(num_peaks):
+            cx = np.random.uniform(0, width)
+            cy = np.random.uniform(0, length)
+            amplitude = np.random.uniform(0.5, 1.0)
+            data += amplitude * np.exp(-((xv - cx) ** 2 + (yv - cy) ** 2) / (2 * sigma ** 2))
+        if data.max() > 0:
+            data /= data.max()
+
         fig, ax = plt.subplots(figsize=(warehouse.width / 100, warehouse.length / 100))
         ax.imshow(
             data,
