@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hackathon/screens/product_search_page.dart';
+import 'package:hackathon/screens/view_heatmap.dart';
 import 'package:hackathon/services/api_service.dart';
 import 'package:hackathon/ui/warehouse_view.dart';
 import '../models/warehouse.dart';
@@ -58,6 +59,17 @@ class _WarehouseViewPageState extends State<WarehouseViewPage> {
                 context,
                 MaterialPageRoute(
                   builder: (_) => ProductSearchPage(),
+                ),
+              );
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.graphic_eq),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ViewHeatmapScreen(),
                 ),
               );
             },
