@@ -23,7 +23,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.19.5'  # Set your desired version
+          flutter-version: '3.32.4'  # Set your desired version
           channel: 'stable'
 
       - name: Create Python virtual environment
