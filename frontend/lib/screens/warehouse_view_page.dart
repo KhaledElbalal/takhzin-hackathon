@@ -93,8 +93,7 @@ class _WarehouseViewPageState extends State<WarehouseViewPage> {
                         ],
                       ),
                     ),
-                  ),
-                Container(
+                  Container(
                   width: 250,
                   color: Colors.grey.shade200,
                   child: Padding(
