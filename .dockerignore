@@ -1,0 +1,10 @@
+.git
+.idea
+**/__pycache__
+**/*.pyc
+frontend/build
+frontend/ios
+frontend/android
+frontend/macos
+frontend/windows
+frontend/linux
